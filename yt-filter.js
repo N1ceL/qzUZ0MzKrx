@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Low-Quality Videos/Shorts Filter + Ads Sign Remover
 // @namespace    http://tampermonkey.net/
-// @version      2.1.5
+// @version      2.1.6
 // @description  Filters out low-view videos and shorts from recommendations + removes ads sign
 // @author       NiceL
 // @match        *://*.youtube.com/*
@@ -142,14 +142,14 @@
     // Quality Checks
     //------------------------------------------------------------------------------------------------------
 
-    function IsLowQualityVideo(ViewsElement)
+    function IsLowQualityVideo(ViewsText)
     {
-        if (!ViewsElement)
+        if (!ViewsText)
         {
             return false;
         }
 
-        var Text = ViewsElement.innerText;
+        var Text = ViewsText.innerText;
         if (!Text || Text.length === 0)
         {
             return false;
@@ -158,25 +158,24 @@
         Text = Text.trim();
 
         var HasViews = ContainsDigit(Text);
-        var HasEnoughViews = HasLargeViewCount(Text);
+        var HasEnoughViews = HasLargeViewCount(Text); // because of different languages I made a simple method to detect >1000 views based on indirect signs
         var IsLowQuality = !HasViews || !HasEnoughViews;
-
         if (IsLowQuality)
         {
-            Log("Low Quality Video", "ViewsElement: \"" + Text + "\"");
+            Log("Low Quality Video", "ViewsText: \"" + Text + "\"");
         }
 
         return IsLowQuality;
     }
 
-    function IsLowQualityShort(LikesElement)
+    function IsLowQualityShort(LikesText)
     {
-        if (!LikesElement)
+        if (!LikesText)
         {
             return false;
         }
 
-        var Text = LikesElement.innerText;
+        var Text = LikesText.innerText;
         if (!Text || Text.length === 0)
         {
             return false;
@@ -193,7 +192,7 @@
         var IsLowQuality = Likes < Config.MinShortsLikes;
         if (IsLowQuality)
         {
-            Log("Low Quality Short", "LikesElement: \"" + Text + "\"");
+            Log("Low Quality Short", "LikesText: \"" + Text + "\"");
         }
 
         return IsLowQuality;
@@ -210,13 +209,16 @@
             return;
         }
 
+        // we are getting a strings from a video panel (row isn't needed, we know that string[2] is always a views count)
         var ViewsElements = Element.querySelectorAll(".yt-core-attributed-string");
         if (ViewsElements.length < 3)
         {
             return;
         }
 
-        if (IsLowQualityVideo(ViewsElements[2]))
+        // we are getting a views text from a string[2]
+        var ViewsText = ViewsElements[2];
+        if (IsLowQualityVideo(ViewsText))
         {
             Element.remove();
         }
@@ -229,24 +231,29 @@
             return;
         }
 
+        // skip if its a stack of videos, but not a single video (it's without a views information anyway)
         if (Element.querySelector(".ytCollectionsStackHost"))
         {
             return;
         }
 
+        // we are getting a rows of video panel (we can't get just a strings, because it's on different positions)
         var MetadataRows = Element.querySelectorAll(".yt-content-metadata-view-model__metadata-row");
         if (MetadataRows.length < 2)
         {
             return;
         }
 
+        // we are getting a strings of a row[1] (we know that row[1] always contains a string[0] as views count)
         var ViewsElements = MetadataRows[1].querySelectorAll(".yt-core-attributed-string");
         if (ViewsElements.length < 2)
         {
             return;
         }
 
-        if (IsLowQualityVideo(ViewsElements[0]))
+        // we are getting a views text from a string[0]
+        var ViewsText = ViewsElements[0];
+        if (IsLowQualityVideo(ViewsText))
         {
             Element.remove();
         }
@@ -275,11 +282,11 @@
                 continue;
             }
 
-            if (Parent.id === "contents")
+            if (Parent.id === "contents") // means that it's a video from a right panel
             {
                 ProcessRightPanelVideo(Video);
             }
-            else if (Parent.id === "content")
+            else if (Parent.id === "content") // means that it's a video from a main page
             {
                 ProcessMainPanelVideo(Parent.parentElement);
             }
@@ -321,6 +328,8 @@
         for (var i = 0; i < VideoList.length; i++)
         {
             var Video = VideoList[i];
+
+            // skip if its not a current active shorts
             if (!Video.querySelector("ytd-reel-video-renderer"))
             {
                 continue;
@@ -332,8 +341,8 @@
                 continue;
             }
 
-            var LikesElement = LikeButton.querySelector(".yt-core-attributed-string");
-            if (IsLowQualityShort(LikesElement))
+            var LikesText = LikeButton.querySelector(".yt-core-attributed-string");
+            if (IsLowQualityShort(LikesText))
             {
                 SkipToNextShort();
             }
