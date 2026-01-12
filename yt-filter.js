@@ -1,11 +1,13 @@
 // ==UserScript==
 // @name         YouTube Low-Quality Videos/Shorts Filter + Ads Sign Remover
 // @namespace    http://tampermonkey.net/
-// @version      2.1.3
+// @version      2.1.4
 // @description  Filters out low-view videos and shorts from recommendations + removes ads sign
 // @author       NiceL
 // @match        *://*.youtube.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=youtube.com
+// @updateURL    https://raw.githubusercontent.com/N1ceL/qzUZ0MzKrx/refs/heads/main/yt-filter.js
+// @downloadURL  https://raw.githubusercontent.com/N1ceL/qzUZ0MzKrx/refs/heads/main/yt-filter.js
 // @grant        none
 // ==/UserScript==
 
