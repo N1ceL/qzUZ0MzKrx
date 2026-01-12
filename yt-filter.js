@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Low-Quality Videos/Shorts Filter + Ads Sign Remover
 // @namespace    http://tampermonkey.net/
-// @version      2.1.4
+// @version      2.1.5
 // @description  Filters out low-view videos and shorts from recommendations + removes ads sign
 // @author       NiceL
 // @match        *://*.youtube.com/*
@@ -371,42 +371,33 @@
     }
 
     //------------------------------------------------------------------------------------------------------
-    // Main
-    //------------------------------------------------------------------------------------------------------
-
-    function RunAllFilters()
-    {
-        RunVideosFilter();
-        RunShortsFilter();
-        RunAdsSignRemover();
-    }
-
-    //------------------------------------------------------------------------------------------------------
     // Event Listeners
     //------------------------------------------------------------------------------------------------------
 
     document.addEventListener("yt-navigate-finish", function ()
     {
-        setTimeout(RunAllFilters, 600);
+        setTimeout(RunVideosFilter, 600);
+        setTimeout(RunShortsFilter, 600);
+        setTimeout(RunAdsSignRemover, 600);
     });
 
     window.addEventListener("message", function ()
     {
-        setTimeout(RunAllFilters, 200);
+        setTimeout(RunVideosFilter, 200);
     });
 
     window.addEventListener("load", function ()
     {
-        setTimeout(RunAllFilters, 200);
+        setTimeout(RunVideosFilter, 200);
     });
 
     window.addEventListener("scrollend", function ()
     {
-        setTimeout(RunAllFilters, 0);
+        setTimeout(RunVideosFilter, 0);
     });
 
     window.addEventListener("click", function ()
     {
-        setTimeout(RunAllFilters, 200);
+        setTimeout(RunVideosFilter, 200);
     });
 })();
