@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Low-Quality Videos/Shorts Filter + Ads Sign Remover
 // @namespace    http://tampermonkey.net/
-// @version      2.1.6
+// @version      2.1.8
 // @description  Filters out low-view videos and shorts from recommendations + removes ads sign
 // @author       NiceL
 // @match        *://*.youtube.com/*
@@ -329,6 +329,12 @@
         {
             var Video = VideoList[i];
 
+            // skip if its first openned shorts
+            if (i == 0)
+            {
+                continue;
+            }
+
             // skip if its not a current active shorts
             if (!Video.querySelector("ytd-reel-video-renderer"))
             {
@@ -385,28 +391,38 @@
 
     document.addEventListener("yt-navigate-finish", function ()
     {
-        setTimeout(RunVideosFilter, 600);
-        setTimeout(RunShortsFilter, 600);
-        setTimeout(RunAdsSignRemover, 600);
+        setTimeout(() => {
+            RunVideosFilter();
+            RunShortsFilter();
+            RunAdsSignRemover();
+        }, 600);
     });
 
     window.addEventListener("message", function ()
     {
-        setTimeout(RunVideosFilter, 200);
+        setTimeout(() => {
+            RunVideosFilter();
+        }, 200);
     });
 
     window.addEventListener("load", function ()
     {
-        setTimeout(RunVideosFilter, 200);
+        setTimeout(() => {
+            RunVideosFilter();
+        }, 200);
     });
 
     window.addEventListener("scrollend", function ()
     {
-        setTimeout(RunVideosFilter, 0);
+        setTimeout(() => {
+            RunVideosFilter();
+        }, 0);
     });
 
     window.addEventListener("click", function ()
     {
-        setTimeout(RunVideosFilter, 200);
+        setTimeout(() => {
+            RunVideosFilter();
+        }, 200);
     });
 })();
