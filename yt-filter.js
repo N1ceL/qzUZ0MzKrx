@@ -330,10 +330,10 @@
             var Video = VideoList[i];
 
             // skip if its first openned shorts
-            //if (i == 0)
-            //{
-            //    continue;
-            //}
+            if (i == 0)
+            {
+                continue;
+            }
 
             // skip if its not a current active shorts
             if (!Video.querySelector("#reel-video-renderer"))
