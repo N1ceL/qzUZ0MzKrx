@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Low-Quality Videos/Shorts Filter + Ads Sign Remover
 // @namespace    http://tampermonkey.net/
-// @version      2.1.8
+// @version      2.1.9
 // @description  Filters out low-view videos and shorts from recommendations + removes ads sign
 // @author       NiceL
 // @match        *://*.youtube.com/*
@@ -210,7 +210,7 @@
         }
 
         // we are getting a strings from a video panel (row isn't needed, we know that string[2] is always a views count)
-        var ViewsElements = Element.querySelectorAll(".yt-core-attributed-string");
+        var ViewsElements = Element.querySelectorAll(".ytAttributedStringHost");
         if (ViewsElements.length < 3)
         {
             return;
@@ -238,14 +238,14 @@
         }
 
         // we are getting a rows of video panel (we can't get just a strings, because it's on different positions)
-        var MetadataRows = Element.querySelectorAll(".yt-content-metadata-view-model__metadata-row");
+        var MetadataRows = Element.querySelectorAll(".ytContentMetadataViewModelMetadataRow");
         if (MetadataRows.length < 2)
         {
             return;
         }
 
         // we are getting a strings of a row[1] (we know that row[1] always contains a string[0] as views count)
-        var ViewsElements = MetadataRows[1].querySelectorAll(".yt-core-attributed-string");
+        var ViewsElements = MetadataRows[1].querySelectorAll(".ytAttributedStringHost");
         if (ViewsElements.length < 2)
         {
             return;
@@ -271,7 +271,7 @@
             return;
         }
 
-        var VideoList = document.querySelectorAll(".lockup.yt-lockup-view-model--wrapper");
+        var VideoList = document.querySelectorAll(".lockup.ytLockupViewModelWrapper");
         for (var i = 0; i < VideoList.length; i++)
         {
             var Video = VideoList[i];
@@ -299,13 +299,13 @@
 
     function SkipToNextShort()
     {
-        var NavButtons = document.querySelectorAll(".navigation-button.style-scope.ytd-shorts");
-        if (NavButtons.length < 2)
+        var NavButtons = document.querySelectorAll("#navigation-button-down");
+        if (NavButtons.length < 1)
         {
             return;
         }
 
-        var ClickTarget = NavButtons[1].querySelector(".yt-spec-touch-feedback-shape__fill");
+        var ClickTarget = NavButtons[0].querySelector(".ytSpecTouchFeedbackShapeTouchResponse");
         if (ClickTarget)
         {
             ClickTarget.click();
@@ -330,13 +330,13 @@
             var Video = VideoList[i];
 
             // skip if its first openned shorts
-            if (i == 0)
-            {
-                continue;
-            }
+            //if (i == 0)
+            //{
+            //    continue;
+            //}
 
             // skip if its not a current active shorts
-            if (!Video.querySelector("ytd-reel-video-renderer"))
+            if (!Video.querySelector("#reel-video-renderer"))
             {
                 continue;
             }
@@ -347,7 +347,7 @@
                 continue;
             }
 
-            var LikesText = LikeButton.querySelector(".yt-core-attributed-string");
+            var LikesText = LikeButton.querySelector(".ytAttributedStringHost");
             if (IsLowQualityShort(LikesText))
             {
                 SkipToNextShort();
