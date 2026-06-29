@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Low-Quality Videos/Shorts Filter + Ads Sign Remover
 // @namespace    http://tampermonkey.net/
-// @version      2.1.9
+// @version      2.2.1
 // @description  Filters out low-view videos and shorts from recommendations + removes ads sign
 // @author       NiceL
 // @match        *://*.youtube.com/*
@@ -26,7 +26,7 @@
         EnableShortsFilter: true,
         EnableAdsSignRemover: true,
 
-        MinShortsLikes: 100,
+        MinShortsLikes: 200,
 
         Debug: true,
     };
@@ -126,16 +126,43 @@
             return null;
         }
 
+        var bHasDigit = false;
+        var bHasSpace = false;
+        var bHasSeparator = false;
+
         for (var i = 0; i < Text.length; i++)
         {
-            if (Text[i] === '\xa0')
+            var A = Text[i];
+
+            if (IsDigit(A))
             {
-                return Infinity;
+                bHasDigit = true;
+            }
+
+            if (IsSpace(A))
+            {
+                bHasSpace = true;
+            }
+
+            if (IsSeparator(A))
+            {
+                bHasSeparator = true;
             }
         }
 
-        var Num = Number(Text);
-        return isNaN(Num) ? null : Num;
+        if (!bHasDigit)
+        {
+            return null;
+        }
+        else if (bHasSpace || bHasSeparator)
+        {
+            return Infinity;
+        }
+        else
+        {
+            var Num = Number(Text);
+            return isNaN(Num) ? null : Num;
+        }
     }
 
     //------------------------------------------------------------------------------------------------------
@@ -245,7 +272,7 @@
         }
 
         // we are getting a strings of a row[1] (we know that row[1] always contains a string[0] as views count)
-        var ViewsElements = MetadataRows[1].querySelectorAll(".ytAttributedStringHost");
+        var ViewsElements = MetadataRows[MetadataRows.length - 1].querySelectorAll(".ytAttributedStringHost");
         if (ViewsElements.length < 2)
         {
             return;
